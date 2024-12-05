@@ -1,5 +1,7 @@
 import fs from 'fs'; // Importa o módulo fs do Node.js, responsável por interagir com o sistema de arquivos.
-import { getTodosOsPosts, criarPost } from "../models/postsModel.js"; // Importa as funções getTodosOsPosts e criarPost do módulo postsModel, que provavelmente contém a lógica para interagir com o banco de dados e realizar operações relacionadas aos posts.
+import { getTodosOsPosts, criarPost, atualizarPost } from "../models/postsModel.js"; // Importa as funções getTodosOsPosts e criarPost do módulo postsModel, que provavelmente contém a lógica para interagir com o banco de dados e realizar operações relacionadas aos posts.
+import gerarDescricaoComGemini from "../services/geminiService.js"
+
 
 export async function listarPostes (req, res) { // Define uma função assíncrona chamada listarPostes, que será utilizada como um handler para a rota GET '/posts'. Essa função recebe como parâmetros o objeto de requisição (req) e o objeto de resposta (res).
     const posts = await getTodosOsPosts(); // Chama a função getTodosOsPosts de forma assíncrona para obter todos os posts do banco de dados e armazena o resultado em uma constante chamada posts.
@@ -32,5 +34,27 @@ export async function uploadImagem(req, res) { // Define uma função assíncron
     } catch(erro) { // Captura qualquer erro que possa ocorrer durante o processo.
         console.error(erro.message); // Imprime uma mensagem de erro no console.
         res.status(500).json({'Erro':'Falha na requisição'}); // Envia uma resposta HTTP com status 500 (Internal Server Error) e uma mensagem de erro genérica.
+    }
+}
+
+export async function atualizarNovoPost(req, res) { 
+    const id = req.params.id;
+    const urlImagem = `http://localhost:3000/${id}.png`;
+    
+    try {
+        const imageBuffer = fs.readFileSync(`uploads/${id}.png`);
+        const descricao = await gerarDescricaoComGemini(imageBuffer);
+
+        const post = {
+            imgUrl: urlImagem,
+            descricao: descricao,
+            alt: req.body.alt
+        }
+
+        const postCriado = await atualizarPost(id, post); 
+        res.status(200).json(postCriado); 
+    } catch(erro) { 
+        console.error(erro.message);
+        res.status(500).json({'Erro':'Falha na requisição'});
     }
 }

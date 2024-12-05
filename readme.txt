@@ -50,6 +50,10 @@ DANDO INÍCIO AO PROJETO
 
 17 - no windows será nescessário criar a pasta 'uploads' na raíz do projeto, já no mac ou linux a pasta será criada sozinha
 
+xx - no prompt digitar { npm i @google/generative-ai } instalar a instenção do google gemini 
+
+xx - no prompt digitar { npm i cors } para instalar o compartilhamento de endereço crusado
+
 
 
 
